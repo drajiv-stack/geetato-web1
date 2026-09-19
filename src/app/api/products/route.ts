@@ -15,14 +15,14 @@ export async function GET(request: NextRequest) {
 
     let query = db.select().from(products);
 
-    const conditions = [eq(products.isActive, true)];
+    const conditions = [eq(products.is_active, 1)];
 
     if (search) {
       conditions.push(
         or(
           like(products.name, `%${search}%`),
           like(products.category, `%${search}%`),
-          like(products.healthGoal, `%${search}%`)
+          like(products.health_goal, `%${search}%`)
         )!
       );
     }
@@ -32,13 +32,13 @@ export async function GET(request: NextRequest) {
     }
 
     if (healthGoal) {
-      conditions.push(eq(products.healthGoal, healthGoal));
+      conditions.push(eq(products.health_goal, healthGoal));
     }
 
     query = query.where(and(...conditions));
 
     const results = await query
-      .orderBy(asc(products.sortOrder), desc(products.createdAt))
+      .orderBy(asc(products.sort_order), desc(products.created_at))
       .limit(limit)
       .offset(offset);
 

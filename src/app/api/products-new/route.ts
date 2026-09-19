@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     }
     
     if (featured !== null && featured !== undefined) {
-      conditions.push(eq(products.featured, featured === 'true'));
+      conditions.push(eq(products.featured, featured === 'true' ? 1 : 0));
     }
     
     if (conditions.length > 0) {
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     
     // Apply sorting and pagination
     const results = await query
-      .orderBy(desc(products.createdAt))
+      .orderBy(desc(products.created_at))
       .limit(limit)
       .offset(offset);
 
@@ -63,11 +63,21 @@ export async function GET(request: NextRequest) {
       subCategory: product.subCategory,
       description: product.description,
       badge: product.badge,
-      featured: product.featured,
-      rating: product.rating,
-      reviews: product.reviews,
-      createdAt: product.createdAt,
-      updatedAt: product.updatedAt
+      featured: !!product.featured,
+      rating: typeof product.rating === 'string' ? parseFloat(product.rating) || 0 : Number(product.rating) || 0,
+      reviews: Number(product.reviews) || 0,
+      imageUrl: product.image_url,
+      image_url: product.image_url,
+      protein: product.protein,
+      carbs: product.carbs,
+      fat: product.fat,
+      calories: product.calories,
+      healthGoal: product.health_goal,
+      price: product.price,
+      weight: product.weight,
+      availability: product.availability,
+      createdAt: product.created_at,
+      updatedAt: product.updated_at
     }));
 
     return NextResponse.json(mappedResults, { status: 200 });

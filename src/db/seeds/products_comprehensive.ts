@@ -2,7 +2,7 @@ import { db } from '@/db';
 import { products, productImages, productNutrition, productIngredients, productHighlights } from '@/db/schema';
 
 async function main() {
-    // Sample products data
+    // Updated products data from provided list
     const sampleProducts = [
         // Health-Focused Bakery - Sugar-Free Treats
         {

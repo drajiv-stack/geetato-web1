@@ -1,7 +1,7 @@
-import { LucideIcon } from "lucide-react"
+import { type LucideProps } from "lucide-react"
 
 interface AccessibleIconProps {
-  icon: LucideIcon
+  icon: React.ComponentType<LucideProps>
   label: string
   className?: string
 }

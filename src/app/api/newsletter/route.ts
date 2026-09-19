@@ -129,9 +129,9 @@ export async function GET(request: NextRequest) {
       query = query.where(eq(newsletterSubscriptions.subscribed, subscribedValue));
     }
 
-    // Order by createdAt DESC with pagination
+    // Order by created_at DESC with pagination
     const results = await query
-      .orderBy(desc(newsletterSubscriptions.createdAt))
+      .orderBy(desc(newsletterSubscriptions.created_at))
       .limit(limit)
       .offset(offset);
 

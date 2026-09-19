@@ -82,31 +82,35 @@ export default function ProductsPage() {
         const res = await fetch("/api/products-new")
         if (res.ok) {
           const data = await res.json()
-          
-          // Fetch images for each product
-          const productsWithImages = await Promise.all(
-            data.map(async (product: any) => {
-              const imagesRes = await fetch(`/api/product-images?productId=${product.id}`)
-              const images = imagesRes.ok ? await imagesRes.json() : []
-              
-              return {
-                ...product,
-                images: images
-              }
-            })
-          )
-          
+
+          // Use the product row's image_url directly instead of fetching per-product images
+          const productsWithImages = data.map((product: any) => ({
+            ...product,
+            images: product.imageUrl
+              ? [{
+                  id: 0,
+                  productId: product.id,
+                  imageUrl: product.imageUrl,
+                  altText: product.name,
+                  displayOrder: 0,
+                  isPrimary: true
+                }]
+              : []
+          }))
+
           setAllProducts(productsWithImages)
-          
+
           // Build subcategories dynamically
           const subCats: Record<string, Set<string>> = {}
           productsWithImages.forEach((p: Product) => {
             if (!subCats[p.category]) {
               subCats[p.category] = new Set()
             }
-            subCats[p.category].add(p.subCategory)
+            if (p.subCategory) {
+              subCats[p.category].add(p.subCategory)
+            }
           })
-          
+
           const subCatsObj: Record<string, string[]> = {}
           Object.entries(subCats).forEach(([cat, subs]) => {
             subCatsObj[cat] = Array.from(subs).sort()

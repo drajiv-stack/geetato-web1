@@ -163,46 +163,36 @@ export default function Home() {
         const response = await fetch('/api/products-new');
         if (response.ok) {
           const data = await response.json();
-          
-          // Fetch images and nutrition for each product
-          const productsWithImages = await Promise.all(
-            data.map(async (product: any) => {
-              const imagesRes = await fetch(`/api/product-images?productId=${product.id}`);
-              const images = imagesRes.ok ? await imagesRes.json() : [];
-              const primaryImage = images.find((img: any) => img.isPrimary) || images[0];
-              
-              // Fetch nutrition data
-              const nutritionRes = await fetch(`/api/product-nutrition?productId=${product.id}`);
-              const nutritionData = nutritionRes.ok ? await nutritionRes.json() : null;
-              
-              // Format nutrition data with units
-              const nutrition = nutritionData ? {
-                protein: `${nutritionData.protein}g`,
-                carbs: `${nutritionData.carbs}g`,
-                fat: `${nutritionData.fat}g`,
-                calories: nutritionData.calories.toString()
-              } : {
-                protein: '0g',
-                carbs: '0g',
-                fat: '0g',
-                calories: '0'
-              };
-              
-              return {
-                id: product.id,
-                name: product.name,
-                category: product.category,
-                image: primaryImage?.imageUrl || '/placeholder-product.jpg',
-                badge: product.badge || 'New',
-                healthGoal: product.subCategory,
-                rating: product.rating || 0,
-                reviews: product.reviews || 0,
-                description: product.description,
-                nutrition
-              };
-            })
-          );
-          
+
+          // Use the image and nutrition already stored on the product row
+          const productsWithImages = data.map((product: any) => {
+            const normalizeUnit = (val: any) => {
+              if (!val) return '0g';
+              const s = `${val}`;
+              return s.endsWith('g') ? s : `${s}g`;
+            };
+
+            const nutrition = {
+              protein: normalizeUnit(product.protein),
+              carbs: normalizeUnit(product.carbs),
+              fat: normalizeUnit(product.fat),
+              calories: product.calories ? `${product.calories}` : '0'
+            };
+
+            return {
+              id: product.id,
+              name: product.name,
+              category: product.category,
+              image: product.imageUrl || '/placeholder-product.jpg',
+              badge: product.badge || 'New',
+              healthGoal: product.healthGoal,
+              rating: product.rating || 0,
+              reviews: product.reviews || 0,
+              description: product.description,
+              nutrition
+            };
+          });
+
           setProducts(productsWithImages.slice(0, 6)); // Show first 6 products on homepage
         }
       } catch (error) {
@@ -563,10 +553,10 @@ export default function Home() {
             <div className="flex flex-wrap justify-center gap-3">
               {[
               { id: "all", label: "All Products" },
-              { id: "gluten-free", label: "Gluten-Free" },
-              { id: "protein-rich", label: "High Protein" },
-              { id: "vegan", label: "Vegan" },
-              { id: "low-sugar", label: "Low Sugar" }].
+              { id: "high-protein", label: "High Protein" },
+              { id: "high-fiber", label: "High Fiber" },
+              { id: "sugar-free", label: "Low Sugar" },
+              { id: "general", label: "Classic" }].
               map((filter) =>
               <motion.button
                 key={filter.id}
